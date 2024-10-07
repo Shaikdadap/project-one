@@ -1,19 +1,26 @@
 pipeline {
     agent any
-    
     tools{
-        maven "Maven-3.9.4"
+        maven 'maven1'
     }
 
     stages {
-        stage('Clone') {
+        stage('clone') {
             steps {
-                git 'https://github.com/ashokitschool/maven-web-app.git'
+                git branch: 'main', url: 'https://github.com/Shaikdadap/project-one.git'
             }
         }
-         stage('Build') {
-            steps {
-                sh 'mvn clean package'
+        
+        stage('Maven Build'){
+            steps{
+             sh 'mvn clean package'
+            }
+        }
+        stage('Deployment'){
+            steps{
+                sshagent(['tomcat']) {
+                   sh 'scp -o StrictHostKeyChecking=no target/maven-web-app.war ubuntu@172.31.5.168:/home/ubuntu/apache-tomcat-9.0.95/webapps'
+                }
             }
         }
     }
